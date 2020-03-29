@@ -1,5 +1,5 @@
 {
-  "name": "node-red-nlp",
+  "name": "node-red-contrib-nlp",
   "version": "0.0.1",
   "description": "Provides a NLP parser to Node-RED",
   "main": "dist/nlp.js",
@@ -9,12 +9,16 @@
   "scripts": {
     "build": "tsc"
   },
-  "node-red" : {
+  "node-red": {
     "nodes": {
-      "nlp": "dist/nlp.js"
+      "intent": "dist/intent.js"
     }
   },
   "devDependencies": {
     "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "@types/node": "^13.9.5",
+    "node-nlp": "^4.3.0"
   }
 }

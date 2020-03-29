@@ -1,0 +1,27 @@
+<script type="text/javascript">
+  RED.nodes.registerType('intent',{
+    category: 'function',
+    color: '#a6bbcf',
+    defaults: {
+      name: {value:""},
+      utterances: {value: "{}"}
+    },
+    inputs:1,
+    outputs:1,
+    icon: "comment.png",
+    label: function() {
+      return this.name||"intent";
+    }
+  });
+</script>
+
+<script type="text/html" data-template-name="intent">
+  <div class="form-row">
+    <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+</script>
+
+<script type="text/html" data-help-name="intent">
+  <p>A node that converts inputs into intents</p>
+</script>
