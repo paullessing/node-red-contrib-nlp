@@ -1,0 +1,20 @@
+{
+  "name": "node-red-nlp",
+  "version": "0.0.1",
+  "description": "Provides a NLP parser to Node-RED",
+  "main": "dist/nlp.js",
+  "author": "paullessing <paul@paullessing.com>",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "build": "tsc"
+  },
+  "node-red" : {
+    "nodes": {
+      "nlp": "dist/nlp.js"
+    }
+  },
+  "devDependencies": {
+    "typescript": "^3.8.3"
+  }
+}
