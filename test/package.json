@@ -1,10 +1,10 @@
 {
   "dependencies": {
     "node-red": "^1.0.4",
-    "node-red-contrib-nlp": "../node-red-contrib-nlp/"
+    "node-red-contrib-nlp": "./.."
   },
   "scripts": {
-    "start": "node-red"
+    "start": "node_modules/.bin/node-red"
   },
   "name": "node-red-test",
   "version": "1.0.0",
@@ -14,7 +14,9 @@
     "nodemon": "^2.0.2"
   },
   "nodemonConfig": {
-    "watch": ["./node_modules/node-red-contrib-nlp/dist"],
+    "watch": [
+      "./node_modules/node-red-contrib-nlp/dist"
+    ],
     "exec": "node_modules/.bin/node-red",
     "ext": "html,js"
   }

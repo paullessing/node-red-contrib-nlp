@@ -1,7 +1,25 @@
+
+
+<script type="text/html" data-template-name="intent">
+  <div class="form-row">
+    <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name">
+    <div class="form-row node-input-rule-container-row">
+      <ol id="utterances-container">
+
+      </ol>
+    </div>
+  </div>
+</script>
+
+<script type="text/html" data-help-name="intent">
+  <p>A node that converts inputs into intents</p>
+</script>
+
 <script type="text/javascript">
   RED.nodes.registerType('intent',{
-    category: 'function',
-    color: '#a6bbcf',
+    category: 'nlp',
+    color: '#ffd9f8',
     defaults: {
       name: {value:""},
       utterances: {value: "{}"}
@@ -11,17 +29,35 @@
     icon: "comment.png",
     label: function() {
       return this.name||"intent";
+    },
+    oneditprepare: function() {
+      // $("#node-input-payload").typedInput({
+      //   default: 'str',
+      //   typeField: $("#node-input-payloadType"),
+      //   types:['str']
+      // });
+
+      $("#utterances-container").css('min-height','150px').css('min-width','450px').editableList({
+        addItem: function(container,i,opt) {
+          $('<div>Hello World</div>').appendTo(container);
+        },
+        removeItem: function(opt) {
+          console.log('Remove', arguments);
+        },
+        // resizeItem: resizeRule,
+        // sortItems: function(rules) {
+        //   var currentOutputs = JSON.parse(outputCount.val()||"{}");
+        //   var rules = $("#node-input-rule-container").editableList('items');
+        //   rules.each(function(i) {
+        //     $(this).find(".node-input-rule-index").html(i+1);
+        //     var data = $(this).data('data');
+        //     currentOutputs[data.hasOwnProperty('i')?data.i:data._i] = i;
+        //   });
+        //   outputCount.val(JSON.stringify(currentOutputs));
+        // },
+        // sortable: true,
+        removable: true
+      });
     }
   });
-</script>
-
-<script type="text/html" data-template-name="intent">
-  <div class="form-row">
-    <label for="node-input-name"><i class="icon-tag"></i> Name</label>
-    <input type="text" id="node-input-name" placeholder="Name">
-  </div>
-</script>
-
-<script type="text/html" data-help-name="intent">
-  <p>A node that converts inputs into intents</p>
 </script>

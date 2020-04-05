@@ -31,7 +31,7 @@ export = function register(RED: Red) {
   manager.addAnswer('en', 'heating_on', 'Heating turned on');
 
   // Train and save the model.
-  const trained = manager.train()
+  const trained = manager.train();
 
   function IntentNode(this: Node, config: NodeProperties) {
     RED.nodes.createNode(this, config);
