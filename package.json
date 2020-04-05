@@ -1,12 +1,13 @@
 {
   "name": "node-red-contrib-nlp",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Provides a NLP parser to Node-RED",
   "author": "paullessing <paul@paullessing.com>",
   "license": "MIT",
   "private": false,
   "scripts": {
     "prepack": "yarn build",
+    "release": "yarn version && git push && git push --tags",
 
     "build": "yarn clean && yarn build:static && yarn build:js",
     "build:static": "node_modules/.bin/copy \"src/**/*.html\" dist",
