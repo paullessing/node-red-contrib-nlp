@@ -1,15 +1,68 @@
 declare module 'node-nlp' {
   type TODO = unknown;
 
+  /* Public Interface
+    Language,
+    NlpUtil,
+    NlpManager,
+    NlpExcelReader,
+    XTableUtils,
+    XTable,
+    XDoc,
+    removeEmojis,
+    Evaluator,
+    SpellCheck,
+    Handlebars,
+    ActionManager,
+    NlgManager,
+    NeuralNetwork,
+    SentimentAnalyzer,
+    SentimentManager,
+    Recognizer,
+    ConversationContext,
+    MemoryConversationContext,
+  */
+
+
   export type EntityType = 'date' | 'datetime' | 'number' | 'currency' | 'phonenumber' | string; // TODO find out others
 
   export type IntentId = string | 'None';
   export type Score = number; // Between 0 and 1
   export type Locale = string; // e.g. "en"
 
+  interface NlpConstructorSettings {
+    languages?: string | string[];
+    locales?: string | string[];
+    corpora?: TODO;
+    autoLoad?: boolean;
+    modelFileName?: string;
+    threshold?: Score;
+
+    tag?: string;
+    ner?: NerConstructorSettings;
+    nlu?: {
+      [locale: string]: {
+        [domain: string]: TODO & {
+          className: string;
+        };
+      };
+    };
+    nlg?: TODO;
+    action?: TODO;
+    sentiment?: TODO;
+    slot?: TODO;
+  }
+
+  interface NerConstructorSettings {
+    ducklingUrl?: string;
+    useDuckling?: boolean;
+    [key: string]: TODO;
+  }
+
   export class NlpManager {
-    constructor(config: {
-      languages: string[];
+    constructor(settings: NlpConstructorSettings & {
+      container?: TODO;
+      ner?: NerConstructorSettings;
     });
 
     public addDocument(locale: Locale, utterance: string, id: IntentId): void;

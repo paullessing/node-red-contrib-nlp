@@ -4,7 +4,7 @@ import { NlpManager } from 'node-nlp';
 export = function register(RED: Red) {
   RED.nodes.registerType('intent', IntentNode);
 
-  const manager = new NlpManager({ languages: ['en'] });
+  const manager = new NlpManager({ languages: ['en'], autoLoad: false });
   // Adds the utterances and intents for the NLP
   manager.addDocument('en', 'turn the heating to %temperature%', 'heating_on');
   manager.addDocument('en', 'turn on the heating', 'heating_on');
