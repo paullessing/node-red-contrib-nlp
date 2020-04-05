@@ -17,6 +17,8 @@ jobs:
     - run: yarn pack
     - uses: Klemensas/action-autotag@stable
       id: update_tag
+      with:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
     - run: echo ${{ steps.update_tag.outputs.tagname }}
 #     - name: Create Release
 #       uses: actions/create-release@v1
