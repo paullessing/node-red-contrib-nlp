@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-nlp",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Provides a NLP parser to Node-RED",
   "author": "paullessing <paul@paullessing.com>",
   "license": "MIT",
@@ -8,20 +8,16 @@
   "scripts": {
     "prepack": "yarn build",
     "release": "yarn version && git push && git push --tags",
-
     "build": "yarn clean && yarn build:static && yarn build:js",
     "build:static": "node_modules/.bin/copy \"src/**/*.html\" dist",
     "build:js": "tsc",
-
     "watch": "yarn build && concurrently --names \"script,static,server\" --prefix-colors \"cyan,white,green\" \"yarn watch:ts\" \"yarn watch:static\" \"yarn watch:server\"",
     "watch:ts": "tsc --watch",
     "watch:static": "nodemon --watch src -e html --exec \"yarn build:static\"",
     "watch:server": "nodemon -V --watch dist -e html,js --exec \"yarn server:start\"",
-
     "server:install": "cd test && yarn install",
     "server:link": "yarn link && cd test && yarn link node-red-contrib-nlp",
     "server:start": "cd test && yarn start",
-
     "clean": "node_modules/.bin/rimraf dist/*"
   },
   "files": [
