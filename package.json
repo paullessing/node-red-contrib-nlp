@@ -2,19 +2,29 @@
   "name": "node-red-contrib-nlp",
   "version": "0.0.1",
   "description": "Provides a NLP parser to Node-RED",
-  "main": "dist/nlp.js",
   "author": "paullessing <paul@paullessing.com>",
   "license": "MIT",
   "private": false,
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "clean": "node_modules/.bin/rimraf dist/*",
+    "copy-static": "node_modules/.bin/copy \"src/**/*.html\" dist",
+    "prepack": "yarn clean && yarn copy-static && yarn build"
   },
+  "files": [
+    "/dist",
+    "/package.json",
+    "/LICENSE",
+    "/yarn.lock"
+  ],
   "node-red": {
     "nodes": {
       "intent": "dist/intent.js"
     }
   },
   "devDependencies": {
+    "copy": "^0.3.2",
+    "rimraf": "^3.0.2",
     "typescript": "^3.8.3"
   },
   "dependencies": {
