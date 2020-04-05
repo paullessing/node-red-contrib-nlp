@@ -67,9 +67,9 @@ export = function register(RED: Red) {
       const result = await manager.process(msg.payload);
 
       send({
-        topic: msg.topic,
+        ...msg,
         payload: result.intent,
-        nlp: result
+        parseResult: result
       });
       done();
     });
