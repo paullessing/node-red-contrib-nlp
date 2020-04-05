@@ -35,6 +35,7 @@ declare module 'node-nlp' {
     locales?: string | string[];
     corpora?: TODO;
     autoLoad?: boolean;
+    autoSave?: boolean;
     modelFileName?: string;
     threshold?: Score;
 

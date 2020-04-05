@@ -128,6 +128,11 @@ export interface NodeProperties {
     x: number;
     y: number;
     z: string;
+
+    /**
+     * Input properties set by the UI
+     */
+    [key: string]: any;
 }
 
 /** Unique node identifier. */
