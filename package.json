@@ -14,7 +14,7 @@
     "watch": "yarn build && concurrently --names \"script,static,server\" --prefix-colors \"cyan,white,green\" \"yarn watch:ts\" \"yarn watch:static\" \"yarn watch:server\"",
     "watch:ts": "tsc --watch",
     "watch:static": "nodemon --watch src -e html --exec \"yarn build:static\"",
-    "watch:server": "nodemon -V --watch dist -e html,js --exec \"yarn server:start\"",
+    "watch:server": "nodemon --watch dist -e html,js --exec \"yarn server:start\"",
     "server:install": "cd test && yarn install",
     "server:link": "yarn link && cd test && yarn link node-red-contrib-nlp",
     "server:start": "cd test && yarn start",
