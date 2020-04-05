@@ -14,7 +14,7 @@ jobs:
       with:
         node-version: '12.x'
     - run: yarn install --frozen-lockfile
-    - run: yarn pack
+    - run: yarn pack --filename=release.tgz
     - uses: Klemensas/action-autotag@stable
       id: update_tag
       with:
@@ -38,7 +38,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-        asset_path: ./releases/release.tgz
+        asset_path: ./release.tgz
         asset_name: release.tgz
         asset_content_type: application/tgz
 
