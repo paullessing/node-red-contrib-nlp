@@ -1,15 +1,15 @@
 
 
 <script type="text/html" data-template-name="intent">
-  <div class="form-row">
-    <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+  <div class="form-row" style="flex: 0 0 auto">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
     <input type="text" id="node-input-name" placeholder="Name">
   </div>
-  <div class="form-row node-input-rule-container-row">
-    <ol id="utterances-container">
+  <div class="form-row node-intents-container-row" id="list-container" style="flex: 1 1 auto; display: flex">
+    <ol id="intents-container">
 
     </ol>
-    <input type="hidden" id="node-input-utterances">
+    <input type="hidden" id="node-input-intents">
   </div>
 </script>
 
@@ -22,56 +22,70 @@
     category: 'nlp',
     color: '#ffd9f8',
     defaults: {
-      name: {value:""},
-      utterances: {value: []}
+      name: {value:''},
+      intents: {value: []}
     },
     inputs:1,
     outputs:1,
-    icon: "comment.png",
+    icon: 'comment.png',
     label: function() {
-      return this.name||"intent";
+      return this.name||'intent';
     },
     oneditprepare: function() {
-      // $("#node-input-payload").typedInput({
+      // $('#node-input-payload').typedInput({
       //   default: 'str',
-      //   typeField: $("#node-input-payloadType"),
+      //   typeField: $('#node-input-payloadType'),
       //   types:['str']
       // });
 
-      $("#utterances-container").css('min-height','150px').css('min-width','450px').editableList({
+      $('#intents-container').css('min-height','150px').css('min-width','450px').editableList({
         addItem: function(container,i,opt) {
           const wrapper = $(
-            `<div style="display: flex">
-               <input
-                 type="text"
-                 placeholder="Utterance"
-                 style="flex: 1 1 70%"
-                 data-key="utterance"
-               >
-               <input
-                 type="text"
-                 placeholder="Intent"
-                 style="flex: 1 1 30%; margin-left: 5px"
-                 data-key="intent"
-               >
-             </div>`);
+           `<div style="display: flex; flex-direction: column; margin: 5px 0">
+              <label style="display: flex; width: 100%">
+                <span style="flex: 0 0 auto">
+                  <i class="fa fa-lightbulb-o" style="margin-right: 5px;"></i>
+                  Intent:
+                </span>
+                <input
+                  type="text"
+                  style="margin-left: 5px; width: 100%; border-radius: 0; border-width: 0 0 1px 0; padding: 0 0 2px 0; margin-bottom: 5px; height: auto; font-family: monospace"
+                  placeholder="Intent ID"
+                  data-key="intent"
+                >
+              </label>
+              <textarea
+                placeholder="Utterances (one per line)"
+                style="width: 100%"
+                data-key="utterances"
+              ></textarea>
+            </div>`);
           wrapper.appendTo(container);
 
-          if (opt.hasOwnProperty('utterance')) {
-            const { utterance, intent } = opt.utterance;
-            wrapper.find('[data-key=utterance]').val(utterance);
+          if (opt.hasOwnProperty('intent')) {
+            const { utterances, intent } = opt.intent;
+            wrapper.find('[data-key=utterances]').val(utterances.join('\n'));
             wrapper.find('[data-key=intent]').val(intent);
           }
+
+          const $utteranceContainer = wrapper.find('[data-key=utterances]');
+          $utteranceContainer.css('overflow', 'hidden');
+
+          $utteranceContainer.height(Math.max($utteranceContainer[0].scrollHeight - 10, 74)); // 74 = 3 lines
+          $utteranceContainer.on('keyup', function () {
+            $(this).height(16);
+            $(this).height(Math.max(this.scrollHeight - 10, 74))
+          })
         },
         removeItem: function(opt) {
-          // console.log('Remove', arguments);
+          console.log('Remove', arguments);
         },
         // resizeItem: resizeRule,
         // sortItems: function(rules) {
-        //   var currentOutputs = JSON.parse(outputCount.val()||"{}");
-        //   var rules = $("#node-input-rule-container").editableList('items');
+        //   var currentOutputs = JSON.parse(outputCount.val()||'{}');
+        //   var rules = $('#node-input-rule-container').editableList('items');
         //   rules.each(function(i) {
-        //     $(this).find(".node-input-rule-index").html(i+1);
+        //     $(this).find('.node-input-rule-index').html(i+1);
         //     var data = $(this).data('data');
         //     currentOutputs[data.hasOwnProperty('i')?data.i:data._i] = i;
         //   });
@@ -81,34 +95,48 @@
         removable: true
       });
 
-      let utterances = this.utterances;
-      if (typeof this.utterances === 'string') {
+      let intents = this.intents;
+      if (typeof this.intents === 'string') {
         try {
-          utterances = JSON.parse(this.utterances);
+          intents = JSON.parse(this.intents);
         } catch (e) {}
       }
 
-      const defaultValue = { utterance: '', intent: '' };
-      if (!utterances || !utterances.length) {
-        utterances = [defaultValue];
+      const defaultValue = { utterances: '', intent: '' };
+      if (!intents || !intents.length) {
+        intents = [defaultValue];
       }
-      utterances.forEach((utterance) => {
-        $("#utterances-container").editableList('addItem',{ utterance });
+      intents.forEach((intent) => {
+        $('#intents-container').editableList('addItem',{ intent });
       });
     },
     oneditsave: function() {
       // console.log('Saving');
-      const utteranceList = $("#utterances-container").editableList('items');
-      const utterances = [];
-      utteranceList.each(function (i) {
-        const utterance = $(this).find('[data-key=utterance]').val();
+      const intentList = $('#intents-container').editableList('items');
+      const intents = [];
+      intentList.each(function (i) {
+        const utterances = $(this).find('[data-key=utterances]').val()
+          .split('\n')
+          .filter(x => x.trim());
         const intent = $(this).find('[data-key=intent]').val();
-        utterances.push({
-          utterance, intent
+        intents.push({
+          intent, utterances
         });
       });
       // console.log('Utterances', utterances);
-      $('#node-input-utterances').val(JSON.stringify(utterances));
+      $('#node-input-intents').val(JSON.stringify(intents));
+    },
+    oneditresize: function(size) {
+      const rows = $('#dialog-form > *:not(.node-intents-container-row)');
+      let height = size.height;
+      for (let i=0;i<rows.length;i++) {
+        height -= $(rows[i]).outerHeight(true);
+      }
+      const editorRow = $('#dialog-form > .node-intents-container-row');
+      height -= (parseInt(editorRow.css('marginTop'))+parseInt(editorRow.css('marginBottom')));
+      height += 16;
+
+      $('#intents-container').editableList('height',height);
     }
   });
 </script>
