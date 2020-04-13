@@ -6,8 +6,6 @@ interface IntentConfig {
   intent: string;
 }
 
-// TODO add a config setting for "emit only on match"
-
 export = function register(RED: Red) {
   RED.nodes.registerType('intent', IntentNode);
 
@@ -18,7 +16,7 @@ export = function register(RED: Red) {
 
     const manager = new NlpManager({ languages: ['en'], autoSave: false, autoLoad: false });
 
-    console.log(config);
+    // console.log(config);
 
     const utterances = parseUtterances(config.intents);
     utterances.forEach(({ utterance, intent }) => {
@@ -44,14 +42,17 @@ export = function register(RED: Red) {
 
       const result = await manager.process(msg.payload);
 
-      send({
-        ...msg,
-        payload: {
-          intent: result.intent,
-          answer: result.answer,
-        },
-        parseResult: result
-      });
+      if (result.intent !== 'None' || !config.noemitnone) {
+        send({
+          ...msg,
+          payload: {
+            intent: result.intent,
+            answer: result.answer,
+          },
+          parseResult: result
+        });
+      }
+
       done();
     });
 

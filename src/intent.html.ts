@@ -5,7 +5,8 @@ RED.nodes.registerType('intent',{
   color: '#ffd9f8',
   defaults: {
     name: { value: '' },
-    intents: { value: [] }
+    intents: { value: [] },
+    noemitnone: { value: false },
   },
   inputs:1,
   outputs:1,
