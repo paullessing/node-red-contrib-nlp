@@ -16,7 +16,27 @@
 </script>
 
 <script type="text/html" data-help-name="intent">
-  <p>A node that converts inputs into intents</p>
+  <p>Parses natural language utterances and outputs the closest matched intent.</p>
+  <p><b>Note:</b> Currently only supports English, i.e. the <code>en</code> locale.</p>
+
+  <h3>Details</h3>
+  <p>This node wraps the <a href="https://www.npmjs.com/package/node-nlp" target="_blank">node-nlp</a> library.
+    Define a set of <i>intents</i> with a list of <i>utterances.</i> When a message is received,
+    the parser will match the utterances and return the closest matched intent.
+  </p>
+  <h3>Outputs</h3>
+  <dl class="message-properties">
+    <dt>payload.intent<span class="property-type">string</span></dt>
+    <dd>The closest matched intent name, or <code>"None"</code> if no intent matched.</dd>
+    <dt>parseResult<span class="property-type">object</span></dt>
+    <dd>The full output from the <code>node-nlp</code> parser.</dd>
+    <dt>parseResult.score<span class="property-type">number</span></dt>
+    <dd>A score between <code>0</code> and <code>1</code> based on how closely the utterance matched.</dd>
+    <dt>parseResult.entities<span class="property-type">array</span></dt>
+    <dd>Entities found in the utterance. See the <i>Entities</i> section for details.</dd>
+  </dl>
+  <h3>Entities</h3>
+
 </script>
 
 <script type="text/javascript">/* replace:intent.html.js */</script>
