@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const { NlpManager } = require('node-nlp');
 
 const manager = new NlpManager({ languages: ['en'], autoSave: false, autoLoad: false });
