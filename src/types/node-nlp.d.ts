@@ -138,7 +138,9 @@ declare module 'node-nlp' {
     | AgeResolution
     | CurrencyResolution
     | DateResolution
-    | DurationResolution;
+    | DateTimeResolution
+    | DurationResolution
+    | TemperatureResolution;
 
   export interface NumberResolution {
     entity: 'number';
@@ -152,11 +154,12 @@ declare module 'node-nlp' {
   export interface DateTimeResolution {
     entity: 'datetime';
     resolution: {
-      values: [{
+      // If the time is ambiguous, you may get multiple values
+      values: {
         timex: string;
         type: 'datetime';
         value: string; // e.g. "2020-01-01 00:00:00"
-      }];
+      }[];
     };
   }
 
@@ -167,6 +170,13 @@ declare module 'node-nlp' {
       timex: string;
       strValue: string;
       date: string; // e.g. "2020-01-01T00:00:00.000Z"
+    } | {
+      type: 'interval';
+      timex: string; // e.g. "XXXX-04-15"
+      strPastValue: string; // e.g. "2020-04-15",
+      pastDate: string; // e.g. "2020-04-15T00:00:00.000Z",
+      strFutureValue: string; // e.g. "2021-04-15",
+      futureDate: string; // e.g. "2021-04-15T00:00:00.000Z"
     };
   }
 
@@ -230,7 +240,6 @@ declare module 'node-nlp' {
     };
   }
 
-
   export interface IpResolution {
     entity: 'ip';
     resolution: {
@@ -264,6 +273,16 @@ declare module 'node-nlp' {
       strValue: string;
       value: number;
       subtype: 'integer' | 'float' | string;
+    }
+  }
+
+  export interface TemperatureResolution {
+    entity: 'temperature';
+    resolution: {
+      strValue: string;
+      value: number;
+      unit: 'K' | 'C' | 'F' | 'R';
+      localeUnit: 'K' | 'C' | 'F' | 'R';
     }
   }
 
