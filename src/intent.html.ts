@@ -5,14 +5,26 @@ RED.nodes.registerType('intent',{
   color: '#ffd9f8',
   defaults: {
     name: { value: '' },
-    intents: { value: [] },
-    noemitnone: { value: false },
+    intents: { value: [] as { intent: string, utterances: string[] }[] },
+    outputs: { value: 1 },
   },
-  inputs:1,
-  outputs:1,
+  inputs: 1,
+  outputs: 1,
   icon: 'comment.png',
   label: function() {
-    return this.name||'intent';
+    return this.name || 'intent';
+  },
+  outputLabels: function(i: number) {
+    if (i === 0) {
+      return 'None';
+    }
+    try {
+      const intents: { intent: string, utterances: string[] }[] =
+        typeof this.intents === 'string' ? JSON.parse(this.intents) : this.intents;
+      return intents[i - 1].intent;
+    } catch (e) {
+      return null;
+    }
   },
   oneditprepare: function() {
     // $('#node-input-payload').typedInput({
@@ -59,7 +71,7 @@ RED.nodes.registerType('intent',{
         $utteranceContainer.on('keyup', function () {
           $(this).height(16);
           $(this).height(Math.max(this.scrollHeight - 10, 74))
-        })
+        });
       },
       // removeItem: function(opt) {
       //   console.log('Remove', arguments);
@@ -109,6 +121,9 @@ RED.nodes.registerType('intent',{
     });
     // console.log('Utterances', utterances);
     $('#node-input-intents').val(JSON.stringify(intents));
+
+    const intentsToStore = intents.filter(({ utterances, intent }) => intent.trim() && utterances.filter((utterance) => utterance.trim()).length)
+    $('#node-input-outputs').val(intentsToStore.length + 1); // +1 for the "none" output
   },
   oneditresize: function(size) {
     const rows = $('#dialog-form > *:not(.node-intents-container-row)');
@@ -121,5 +136,5 @@ RED.nodes.registerType('intent',{
     height += 16;
 
     $('#intents-container').editableList('height',height);
-  }
+  },
 });

@@ -7,24 +7,28 @@
     <ol id="intents-container">
     </ol>
     <input type="hidden" id="node-input-intents">
-  </div>
-
-  <div class="form-row">
-    <input type="checkbox" id="node-input-noemitnone" style="display: inline-block; width: auto; vertical-align: top;" autocomplete="off">
-    <label style="width: auto;" for="node-input-noemitnone"><span> Only emit when an intent was found</span></label>
+    <input type="hidden" id="node-input-outputs">
   </div>
 </script>
 
 <script type="text/html" data-help-name="intent">
   <p>Parses natural language utterances and outputs the closest matched intent.</p>
   <p><b>Note:</b> Currently only supports English, i.e. the <code>en</code> locale.</p>
-
-  <h3>Details</h3>
   <p>This node wraps the <a href="https://www.npmjs.com/package/node-nlp" target="_blank">node-nlp</a> library.
-    Define a set of <i>intents</i> with a list of <i>utterances.</i> When a message is received,
+    You define a set of <i>intents</i> with a list of <i>utterances.</i> When a message is received,
     the parser will match the utterances and return the closest matched intent.
   </p>
+  <h3>Input</h3>
+  <dl class="message-properties">
+    <dt>payload
+      <span class="property-type">string</span>
+    </dt>
+    <dd>The input message to parse.
+      This should be a single utterance and will be matched to the most appropriate intent.</dd>
+  </dl>
   <h3>Outputs</h3>
+  <p>If the input was matched to an intent, the corresponding output will emit a message.<br>
+    The first output corresponds to <code>None</code>, i.e. the utterance was not matched to any intent.</p>
   <dl class="message-properties">
     <dt>payload.intent<span class="property-type">string</span></dt>
     <dd>The closest matched intent name, or <code>"None"</code> if no intent matched.</dd>

@@ -18,7 +18,20 @@ export = function register(RED: Red) {
 
     // console.log(config);
 
-    const utterances = parseUtterances(config.intents);
+    const parsedIntents = parseIntents(config.intents);
+    const intentNames = ['None'].concat(parsedIntents
+      .filter(({ utterances, intent }) => intent.trim() && utterances.filter((utterance) => utterance.trim()).length)
+      .map(({ intent }) => intent));
+
+    function createOutput<T>(intentName: string, output: T): (T | null)[] {
+      const outArray: (T | null)[] = [];
+      for (let i = 0; i < intentNames.length; i++) {
+        outArray.push(intentNames[i] === intentName ? output : null);
+      }
+      return outArray;
+    }
+
+    const utterances = parseUtterances(parsedIntents);
     utterances.forEach(({ utterance, intent }) => {
       manager.addDocument('en', utterance, intent);
     });
@@ -43,36 +56,43 @@ export = function register(RED: Red) {
       const result = await manager.process(msg.payload);
 
       if (result.intent !== 'None' || !config.noemitnone) {
-        send({
+        send(createOutput(result.intent, {
           ...msg,
           payload: {
             intent: result.intent,
             // answer: result.answer,
           },
           parseResult: result
-        });
+        }));
+      } else {
+        send(null);
       }
 
-      done();
+      done && done();
     });
 
-    function parseUtterances(configUtterances: string | IntentConfig[]): { utterance: string, intent: string }[] {
+    function parseIntents(intentConfig: IntentConfig[] | string): IntentConfig[] {
       try {
-        const parsed: IntentConfig[] = typeof configUtterances === 'string' ?
-          JSON.parse(configUtterances) :
-          configUtterances;
-        const utterances: { utterance: string, intent: string }[] = [];
-        parsed.forEach(({ utterances: _utterances, intent }) => {
-          if (_utterances && _utterances.length && intent) {
-            _utterances.forEach((utterance) => {
-              utterances.push({ intent, utterance });
-            })
-          }
-        });
-        return utterances;
+        if (typeof intentConfig === 'string') {
+          return JSON.parse(intentConfig) || [];
+        } else {
+          return intentConfig;
+        }
       } catch (e) {
         return [];
       }
+    }
+
+    function parseUtterances(configUtterances: IntentConfig[]): { utterance: string, intent: string }[] {
+      const utterances: { utterance: string, intent: string }[] = [];
+      configUtterances.forEach(({ utterances: _utterances, intent }) => {
+        if (_utterances && _utterances.length && intent) {
+          _utterances.forEach((utterance) => {
+            utterances.push({ intent, utterance });
+          })
+        }
+      });
+      return utterances;
     }
   }
 }
