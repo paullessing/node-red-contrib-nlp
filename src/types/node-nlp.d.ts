@@ -102,7 +102,7 @@ declare module 'node-nlp' {
     intent: IntentId;
     score: Score;
     optionalUtterance?: string; // E.g. "Hello %datetime%"
-    sourceEntities: unknown[];
+    sourceEntities: SourceEntity[];
     entities: ProcessedEntity[]; // TODO can this be null?
     sentiment: Sentiment;
     actions: unknown[];
@@ -125,32 +125,41 @@ declare module 'node-nlp' {
     utteranceText: string; // e.g. "now"
   } & Resolution;
 
-  export type Resolution = NumberResolution
-    | DateTimeResolution
-    | DateResolution
-    | CurrencyResolution
-    | PhonenumberResolution
-    | EmailResolution
+  export type Resolution =
+      EmailResolution
+    | IpResolution
     | HashtagResolution
-    | UrlResolution;
+    | PhoneResolution
+    | UrlResolution
+    | NumberResolution
+    | OrdinalResolution
+    | PercentageResolution
+    | DimensionResolution
+    | AgeResolution
+    | CurrencyResolution
+    | DateResolution
+    | DateTimeResolution
+    | DurationResolution
+    | TemperatureResolution;
 
   export interface NumberResolution {
     entity: 'number';
     resolution: {
       strValue: string;
       value: number;
-      subtype: 'integer' | string;
+      subtype: 'integer' | 'float' | string;
     };
   }
 
   export interface DateTimeResolution {
     entity: 'datetime';
     resolution: {
-      values: [{
+      // If the time is ambiguous, you may get multiple values
+      values: {
         timex: string;
         type: 'datetime';
         value: string; // e.g. "2020-01-01 00:00:00"
-      }];
+      }[];
     };
   }
 
@@ -161,6 +170,13 @@ declare module 'node-nlp' {
       timex: string;
       strValue: string;
       date: string; // e.g. "2020-01-01T00:00:00.000Z"
+    } | {
+      type: 'interval';
+      timex: string; // e.g. "XXXX-04-15"
+      strPastValue: string; // e.g. "2020-04-15",
+      pastDate: string; // e.g. "2020-04-15T00:00:00.000Z",
+      strFutureValue: string; // e.g. "2021-04-15",
+      futureDate: string; // e.g. "2021-04-15T00:00:00.000Z"
     };
   }
 
@@ -174,7 +190,7 @@ declare module 'node-nlp' {
     };
   }
 
-  export interface PhonenumberResolution {
+  export interface PhoneResolution {
     entity: 'phonenumber';
     resolution: {
       value: string;
@@ -201,6 +217,110 @@ declare module 'node-nlp' {
     resolution: {
       value: string;
     };
+  }
+
+  export interface DurationResolution {
+    entity: 'duration';
+    resolution: {
+      values: [{
+        timex: string; // e.g. 'PT24M'
+        type: 'duration';
+        value: string; // Numeric string representing seconds e.g. "1440"
+      }];
+    }
+  }
+
+  export interface AgeResolution {
+    entity: 'age';
+    resolution: {
+      strValue: string;
+      value: number;
+      unit: string; // e.g. "Year"
+      localeUnit: string; // e.g. "Ans"
+    };
+  }
+
+  export interface IpResolution {
+    entity: 'ip';
+    resolution: {
+      value: string; // e.g. "127.0.0.1"
+      type: 'ipv4' | 'ipv6';
+    }
+  }
+
+  export interface DimensionResolution {
+    entity: 'dimension';
+    resolution: {
+      strValue: string;
+      value: number;
+      unit: string; // e.g. "Meter"
+      localeUnit: string;
+    }
+  }
+
+  export interface OrdinalResolution { // 1st, 2nd, fifth
+    entity: 'ordinal';
+    resolution: {
+      strValue: string;
+      value: number;
+      subtype: 'integer' | string;
+    }
+  }
+
+  export interface PercentageResolution {
+    entity: 'percentage';
+    resolution: {
+      strValue: string;
+      value: number;
+      subtype: 'integer' | 'float' | string;
+    }
+  }
+
+  export interface TemperatureResolution {
+    entity: 'temperature';
+    resolution: {
+      strValue: string;
+      value: number;
+      unit: 'K' | 'C' | 'F' | 'R';
+      localeUnit: 'K' | 'C' | 'F' | 'R';
+    }
+  }
+
+  export interface SourceEntity {
+    start: number; // position in the string
+    end: number; // position in the string
+    resolution: {
+      value: string;
+      unit?: string; // age
+      srcUnit?: string; // age
+    }
+    text: string;
+    typeName: 'number' | 'ordinal' | 'percentage' | 'age' | 'currency' | 'dimension' | 'datetimeV2.date' | 'phonenumber' | 'ip' | 'email' | 'hashtag' | 'url';
+  }
+
+  export type SourceResolution = {
+    value: string;
+  } | { // age, dimension, email, hashtag, url
+    value: string | null;
+    unit: string;
+    srcUnit: string;
+  } | { // currency
+    value: string;
+    unit: string; // British pound
+    isoCurrency: string; // GBP
+    srcUnit: string; // British pound
+  } | { // datetimeV2.date
+    values: [{
+      timex: string;
+      type: 'date';
+      value: string; // ISO date YYYY-MM-DD
+    }];
+  } | { // phonenumber
+    value: string;
+    score: string; // probably 0 to 1
+  } | { // ip
+    value: string;
+    type: 'ipv4' | 'ipv6';
   }
 
   export interface Sentiment {

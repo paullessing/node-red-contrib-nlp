@@ -16,7 +16,246 @@
 </script>
 
 <script type="text/html" data-help-name="intent">
-  <p>A node that converts inputs into intents</p>
+  <p>Parses natural language utterances and outputs the closest matched intent.</p>
+  <p><b>Note:</b> Currently only supports English, i.e. the <code>en</code> locale.</p>
+
+  <h3>Details</h3>
+  <p>This node wraps the <a href="https://www.npmjs.com/package/node-nlp" target="_blank">node-nlp</a> library.
+    Define a set of <i>intents</i> with a list of <i>utterances.</i> When a message is received,
+    the parser will match the utterances and return the closest matched intent.
+  </p>
+  <h3>Outputs</h3>
+  <dl class="message-properties">
+    <dt>payload.intent<span class="property-type">string</span></dt>
+    <dd>The closest matched intent name, or <code>"None"</code> if no intent matched.</dd>
+
+    <dt>parseResult<span class="property-type">object</span></dt>
+    <dd>The full output from the <code>node-nlp</code> parser.</dd>
+
+    <dt>parseResult.score<span class="property-type">number</span></dt>
+    <dd>A score between <code>0</code> and <code>1</code> based on how closely the utterance matched.</dd>
+
+    <dt>parseResult.entities<span class="property-type">array</span></dt>
+    <dd>Entities found in the utterance. See the <i>Entities</i> section for details.</dd>
+  </dl>
+  <h3>Entities</h3>
+  <p>
+    The node-nlp library uses <a href="https://github.com/facebook/duckling">Duckling</a> to extract entities from the utterance.
+    There are a number of different types of entity that are automatically detected.
+  </p>
+  <p>
+    Entities are returned as an array, and have the following properties:
+  </p>
+  <dl class="message-properties">
+
+    <dt>entity<span class="property-type">string</span></dt>
+    <dd>The type of the entity. See the table below for possible values.</dd>
+
+    <dt>start<span class="property-type">number</span></dt>
+    <dd>The start position of the entity in the input utterance.</dd>
+
+    <dt>end<span class="property-type">number</span></dt>
+    <dd>The end position of the entity in the input utterance.</dd>
+
+    <dt>len<span class="property-type">number</span></dt>
+    <dd>The length of the entity string in the input utterance.</dd>
+
+    <dt>accuracy<span class="property-type">number</span></dt>
+    <dd>How confident (between 0 and 1) the parser is that this entity was correctly parsed.</dd>
+
+    <dt>sourceText, utteranceText<span class="property-type">string</span></dt>
+    <dd>The text of the found entity in the input utterance.</dd>
+
+    <dt>resolution<span class="property-type">mixed</span></dt>
+    <dd>Fully parsed data </dd>
+
+    <dt>resolution<span class="property-type">mixed</span></dt>
+    <dd>Fully parsed data about the entity. Depends on the <code>entity</code> value. See below for the data returned for each type.</dd>
+  </dl>
+  <h4>Supported Entity Types</h4>
+  <p>The following entities are returned in the <code>msg.payload.parseResult.entities</code> property.</p>
+  <dl class="message-properties">
+
+    <dt><code>number</code></dt>
+    <dd>A numeric value. This can be an integer or float. Numbers can be presented as a string,
+      such as <code>"fifty"</code>.
+      <dl class="message-properties">
+        <dt>resolution.value<span class="property-type">number</span></dt>
+        <dd>The parsed value.</dd>
+        <dt>resolution.strValue<span class="property-type">string</span></dt>
+        <dd>Same as <code>resolution.value</code> as a string.</dd>
+        <dt>resolution.subtype<span class="property-type">string</span></dt>
+        <dd>Either <code>"integer"</code> or <code>"float"</code>.</dd>
+      </dl>
+    </dd>
+
+    <dt><code>percentage</code></dt>
+    <dd>A percentage value, e.g. <code>07123456789</code>.
+      <dl class="message-properties">
+        <dt>resolution.value<span class="property-type">string</span></dt>
+        <dd>The phone number as it appears in the source text.</dd>
+        <dt>resolution.score<span class="property-type">number</span></dt>
+        <dd>Confidence (between 0 and 1) that this entity is a phone number.</dd>
+        <dt>resolution.score<span class="property-type">number</span></dt>
+        <dd>Confidence (between 0 and 1) that this entity is a phone number.</dd>
+      </dl>
+    </dd>
+
+    <dt><code>email</code></dt>
+    <dd>An email address.
+      <dl class="message-properties">
+        <dt>resolution.value<span class="property-type">string</span></dt>
+        <dd>The recognised email address.</dd>
+      </dl>
+    </dd>
+
+    <dt><code>phonenumber</code></dt>
+    <dd>A phone number, e.g. <code>07123456789</code>.
+      <dl class="message-properties">
+        <dt>resolution.value<span class="property-type">string</span></dt>
+        <dd>The phone number as it appears in the source text.</dd>
+        <dt>resolution.score<span class="property-type">number</span></dt>
+        <dd>Confidence (between 0 and 1) that this entity is a phone number.</dd>
+      </dl>
+    </dd>
+
+    <dt><code>url</code></dt>
+    <dd>A URL, partial or fully-qualified, such as <code>example.com</code> or <code>https://example.com/page.html</code>.
+      <dl class="message-properties">
+        <dt>resolution.value<span class="property-type">string</span></dt>
+        <dd>The found URL value.</dd>
+      </dl>
+    </dd>
+
+    <dt><code>ip</code></dt>
+    <dd>An IP address, e.g. <code>127.0.0.1</code> (IPV4) or <code>fe80::1ff:fe23:4567:890a</code> (IPV6).
+      <dl class="message-properties">
+        <dt>resolution.value<span class="property-type">string</span></dt>
+        <dd>The recognised email address.</dd>
+        <dt>resolution.type<span class="property-type">string</span></dt>
+        <dd>Either <code>"ipv4"</code> or <code>"ipv6"</code>.</dd>
+      </dl>
+    </dd>
+
+    <dt><code>hashtag</code></dt>
+    <dd>A hashtag, e.g. <code>#nodered</code>.
+      <dl class="message-properties">
+        <dt>resolution.value<span class="property-type">string</span></dt>
+        <dd>The hashtag found.</dd>
+      </dl></dd>
+
+    <dt><code>dimension</code></dt>
+    <dd>A dimensional value, such as meters, miles, or kilograms.
+      <dl class="message-properties">
+        <dt>resolution.value<span class="property-type">number</span></dt>
+        <dd>The parsed value.</dd>
+        <dt>resolution.strValue<span class="property-type">string</span></dt>
+        <dd>Same as <code>resolution.value</code> as a string.</dd>
+        <dt>resolution.unit, resolution.localeUnit<span class="property-type">string</span></dt>
+        <dd>The full name of the unit, such as <code>"Kilogram"</code>.</dd>
+      </dl>
+    </dd>
+
+    <dt><code>date</code></dt>
+    <dd>A date, either a specific year or indeterminate.<br>
+      Example <code>resolution</code> (source text was <code>"1st April"</code>):
+      <pre><code class="language-json">{
+  type: "interval",
+  timex: "XXXX-04-01",
+  strPastValue: "2020-04-01",
+  pastDate: "2020-04-01T00:00:00.000Z",
+  strFutureValue: "2021-04-01",
+  futureDate: "2021-04-01T00:00:00.000Z"
+}</code></pre>
+      Example <code>resolution</code> (source text was <code>"1st April 2020"</code>):
+      <pre><code class="language-json">{
+  type: "date",
+  timex: "2020-04-01",
+  strValue: "2020-04-01",
+  date: "2020-04-01T00:00:00.000Z"
+}</code></pre>
+    </dd>
+
+    <dt><code>datetime</code></dt>
+    <dd>A specific date and time, possibly without a year.<br>
+      If no year is supplied, there will be one value for the current year and one for the next.<br>
+      If the time is ambiguous (e.g. <code>10.30</code>) there will be one value for AM and one for PM.
+      <dl class="message-properties">
+        <dt>resolution.values<span class="property-type">array</span></dt>
+        <dd>Up to four values (see above).</dd>
+        <dt>resolution.values[].timex<span class="property-type">string</span></dt>
+        <dd>An ISO-8601 partial value such as <code>"2020-04-01T10:30"</code> or <code>"XXXX-04-01T10"</code>.</dd>
+        <dt>resolution.values[].type<span class="property-type">string</span></dt>
+        <dd>Usually <code>"datetime"</code>.</dd>
+        <dt>resolution.values[].value<span class="property-type">string</span></dt>
+        <dd>A string representation following the format <code>YYYY-MM-DD HH:mm:ss</code>.</dd>
+      </dl>
+    </dd>
+
+    <dt><code>duration</code></dt>
+    <dd>A duration. There
+      <dl class="message-properties">
+        <dt>resolution.values<span class="property-type">array</span></dt>
+        <dd>Usually one value.</dd>
+        <dt>resolution.values[0].times<span class="property-type">string</span></dt>
+        <dd>A timex string representing the duration, such as <code>"PT12H"</code> or <code>"PT30S"</code>.</dd>
+        <dt>resolution.values[0].type<span class="property-type">string</span></dt>
+        <dd>Usually <code>"duration"</code>.</dd>
+        <dt>resolution.values[0].value<span class="property-type">string</span></dt>
+        <dd>The string representation of the numeric value, e.g. <code>"30"</code> for a duration of <code>"30 seconds"</code>.</dd>
+      </dl>
+    </dd>
+
+    <dt><code>age</code></dt>
+    <dd>A person's age.
+      <dl class="message-properties">
+        <dt>resolution.value<span class="property-type">number</span></dt>
+        <dd>The parsed value.</dd>
+        <dt>resolution.strValue<span class="property-type">string</span></dt>
+        <dd>Same as <code>resolution.value</code> as a string.</dd>
+        <dt>resolution.unit, resolution.localeUnit<span class="property-type">string</span></dt>
+        <dd>The full name of the unit, such as <code>"Year"</code> or <code>"Month"</code>.</dd>
+      </dl>
+    </dd>
+
+    <dt><code>temperature</code></dt>
+    <dd>A temperature value such as <code>"15C"</code>.
+      <dl class="message-properties">
+        <dt>resolution.value<span class="property-type">number</span></dt>
+        <dd>The parsed value.</dd>
+        <dt>resolution.strValue<span class="property-type">string</span></dt>
+        <dd>Same as <code>resolution.value</code> as a string.</dd>
+        <dt>resolution.unit, resolution.localeUnit<span class="property-type">string</span></dt>
+        <dd>Short locale unit: <code>"K"</code>, <code>"C"</code>, <code>"F"</code>, <code>"R"</code></dd>
+      </dl>
+    </dd>
+
+    <dt><code>currency</code></dt>
+    <dd>A currency amount.
+      <dl class="message-properties">
+        <dt>resolution.value<span class="property-type">number</span></dt>
+        <dd>The parsed value.</dd>
+        <dt>resolution.strValue<span class="property-type">string</span></dt>
+        <dd>Same as <code>resolution.value</code> as a string.</dd>
+        <dt>resolution.unit, resolution.localeUnit<span class="property-type">string</span></dt>
+        <dd>The full name of the unit, such as <code>"Pound"</code> or <code>"Dollar"</code>.</dd>
+      </dl>
+    </dd>
+
+    <dt><code>ordinal</code></dt>
+    <dd>An ordinal value, such as <code>"first"</code> or <code>"15th"</code>.
+      <dl class="message-properties">
+        <dt>resolution.value<span class="property-type">number</span></dt>
+        <dd>The parsed value, such as <code>1</code> for <code>"first"</code>.</dd>
+        <dt>resolution.strValue<span class="property-type">string</span></dt>
+        <dd>Same as <code>resolution.value</code> as a string.</dd>
+        <dt>resolution.subtype<span class="property-type">string</span></dt>
+        <dd>Subtype, usually <code>"integer"</code>.</dd>
+      </dl>
+    </dd>
+  </dl>
+
+  <a href="https://github.com/axa-group/nlp.js/blob/master/docs/v3/builtin-duckling.md"></a>
 </script>
 
 <script type="text/javascript">/* replace:intent.html.js */</script>

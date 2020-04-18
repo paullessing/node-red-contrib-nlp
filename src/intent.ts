@@ -47,7 +47,7 @@ export = function register(RED: Red) {
           ...msg,
           payload: {
             intent: result.intent,
-            answer: result.answer,
+            // answer: result.answer,
           },
           parseResult: result
         });
